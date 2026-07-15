@@ -1,0 +1,5 @@
+node_modules
+lib/db/migrations
+.expo
+android
+ios
