@@ -25,6 +25,12 @@ google-services.json
 GoogleService-Info.plist
 credentials.json
 
+# Build artifacts
+*.apk
+*.aab
+*.ipa
+*.log
+
 # env files
 .env
 .env.local

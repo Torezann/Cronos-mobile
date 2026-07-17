@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e5a8d2d8-f4cb-44f2-be90-f83278b2979d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "f9da5b35-7027-4ae4-a32c-76d8db7fd1b4",
+  "prevId": "789d165a-d606-43c2-bf5f-669e24f4beb2",
   "tables": {
     "app_meta": {
       "name": "app_meta",
@@ -67,6 +67,14 @@
           "autoincrement": false,
           "default": 0
         },
+        "active": {
+          "name": "active",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 1
+        },
         "created_at": {
           "name": "created_at",
           "type": "integer",
@@ -118,13 +126,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "time": {
-          "name": "time",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false
         },
         "dur": {
@@ -295,13 +296,6 @@
         "dow": {
           "name": "dow",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "time": {
-          "name": "time",
-          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false

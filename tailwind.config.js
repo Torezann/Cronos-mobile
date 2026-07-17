@@ -5,6 +5,16 @@ module.exports = {
   presets: [require('nativewind/preset')],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Archivo_400Regular'],
+        'sans-medium': ['Archivo_500Medium'],
+        'sans-semibold': ['Archivo_600SemiBold'],
+        'sans-bold': ['Archivo_700Bold'],
+        'sans-extrabold': ['Archivo_800ExtraBold'],
+        mono: ['IBMPlexMono_400Regular'],
+        'mono-medium': ['IBMPlexMono_500Medium'],
+        'mono-semibold': ['IBMPlexMono_600SemiBold'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',

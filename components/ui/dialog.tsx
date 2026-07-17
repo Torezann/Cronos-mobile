@@ -29,7 +29,9 @@ const DialogOverlay = React.forwardRef<DialogPrimitive.OverlayRef, DialogPrimiti
           exiting={FadeOut.duration(150)}
           style={StyleSheet.absoluteFill as ViewStyle}
         />
-        <View style={StyleSheet.absoluteFill as ViewStyle}>
+        <View
+          style={StyleSheet.absoluteFill as ViewStyle}
+          className="items-center justify-center p-4">
           {props.children as React.ReactNode}
         </View>
       </DialogPrimitive.Overlay>
@@ -78,7 +80,11 @@ DialogFooter.displayName = 'DialogFooter';
 const DialogTitle = React.forwardRef<DialogPrimitive.TitleRef, DialogPrimitive.TitleProps>(
   ({ className, ...props }, ref) => (
     <TextClassContext.Provider value="text-lg font-semibold leading-none tracking-tight text-foreground">
-      <DialogPrimitive.Title ref={ref} className={cn(className)} {...props} />
+      <DialogPrimitive.Title
+        ref={ref}
+        className={cn('text-lg font-semibold leading-none tracking-tight text-foreground', className)}
+        {...props}
+      />
     </TextClassContext.Provider>
   )
 );
@@ -89,7 +95,11 @@ const DialogDescription = React.forwardRef<
   DialogPrimitive.DescriptionProps
 >(({ className, ...props }, ref) => (
   <TextClassContext.Provider value="text-sm text-muted-foreground">
-    <DialogPrimitive.Description ref={ref} className={cn(className)} {...props} />
+    <DialogPrimitive.Description
+      ref={ref}
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
   </TextClassContext.Provider>
 ));
 DialogDescription.displayName = DialogPrimitive.Description.displayName;

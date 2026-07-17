@@ -78,7 +78,11 @@ SheetFooter.displayName = 'SheetFooter';
 const SheetTitle = React.forwardRef<DialogPrimitive.TitleRef, DialogPrimitive.TitleProps>(
   ({ className, ...props }, ref) => (
     <TextClassContext.Provider value="text-lg font-semibold leading-none tracking-tight text-foreground">
-      <DialogPrimitive.Title ref={ref} className={cn(className)} {...props} />
+      <DialogPrimitive.Title
+        ref={ref}
+        className={cn('text-lg font-semibold leading-none tracking-tight text-foreground', className)}
+        {...props}
+      />
     </TextClassContext.Provider>
   )
 );
@@ -89,7 +93,11 @@ const SheetDescription = React.forwardRef<
   DialogPrimitive.DescriptionProps
 >(({ className, ...props }, ref) => (
   <TextClassContext.Provider value="text-sm text-muted-foreground">
-    <DialogPrimitive.Description ref={ref} className={cn(className)} {...props} />
+    <DialogPrimitive.Description
+      ref={ref}
+      className={cn('text-sm text-muted-foreground', className)}
+      {...props}
+    />
   </TextClassContext.Provider>
 ));
 SheetDescription.displayName = DialogPrimitive.Description.displayName;

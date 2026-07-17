@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e5a8d2d8-f4cb-44f2-be90-f83278b2979d",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "789d165a-d606-43c2-bf5f-669e24f4beb2",
+  "prevId": "e5a8d2d8-f4cb-44f2-be90-f83278b2979d",
   "tables": {
     "app_meta": {
       "name": "app_meta",
@@ -118,13 +118,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false
-        },
-        "time": {
-          "name": "time",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
           "autoincrement": false
         },
         "dur": {
@@ -295,13 +288,6 @@
         "dow": {
           "name": "dow",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "time": {
-          "name": "time",
-          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
