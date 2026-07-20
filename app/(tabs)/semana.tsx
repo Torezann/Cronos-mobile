@@ -20,6 +20,10 @@ export default function SemanaScreen() {
   const rows = useSessionsForRange(week[0], week[6]);
   const { toggleSession } = useSessionMutations();
 
+  // useSessionsForRange inclui matérias de metas desativadas (histórico da ofensiva);
+  // aqui mostramos só o que resta de metas ativas.
+  const activeSubjectIds = new Set(subjects.map((s) => s.id));
+
   return (
     <ScrollView
       className="flex-1 bg-background"
@@ -37,7 +41,10 @@ export default function SemanaScreen() {
         week.map((date) => {
           const isToday = date === today;
           const dayRows = rows.filter(
-            (r) => r.session.date === date && r.session.status !== 'desistido'
+            (r) =>
+              r.session.date === date &&
+              r.session.status !== 'desistido' &&
+              activeSubjectIds.has(r.subject.id)
           );
           const dayNum = Number(date.slice(8, 10));
           return (
