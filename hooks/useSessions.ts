@@ -62,6 +62,10 @@ export function useSessionsForDate(date: string): SessionWithSubject[] {
   return data ?? [];
 }
 
+/**
+ * Histórico de sessões no período, incluindo matérias de metas desativadas —
+ * desativar uma meta não deve apagar retroativamente a ofensiva já cumprida.
+ */
 export function useSessionsForRange(start: string, end: string): SessionWithSubject[] {
   const { data } = useLiveTablesQuery(
     db
@@ -69,7 +73,7 @@ export function useSessionsForRange(start: string, end: string): SessionWithSubj
       .from(sessions)
       .innerJoin(subjects, eq(sessions.subjectId, subjects.id))
       .innerJoin(goals, eq(subjects.goalId, goals.id))
-      .where(and(gte(sessions.date, start), lte(sessions.date, end), eq(goals.active, 1)))
+      .where(and(gte(sessions.date, start), lte(sessions.date, end)))
       .orderBy(sessions.date, sessions.id),
     ['sessions', 'subjects', 'goals'],
     [start, end]

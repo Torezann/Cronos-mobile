@@ -85,10 +85,12 @@ export default function GoalDetailScreen() {
   // Form de cronograma
   const [templateFormOpen, setTemplateFormOpen] = useState(false);
   const [editingTemplate, setEditingTemplate] = useState<Template | null>(null);
-  const [tplDow, setTplDow] = useState(1);
+  const [tplDows, setTplDows] = useState<number[]>([1]);
   const [tplSubjectId, setTplSubjectId] = useState<number | null>(null);
   const [tplDur, setTplDur] = useState(60);
   const [templateToDelete, setTemplateToDelete] = useState<Template | null>(null);
+  const [dowToClear, setDowToClear] = useState<number | null>(null);
+  const [clearAllOpen, setClearAllOpen] = useState(false);
 
   const resetSubjectForm = () => {
     setEditingSubject(null);
@@ -112,9 +114,19 @@ export default function GoalDetailScreen() {
 
   const resetTemplateForm = () => {
     setEditingTemplate(null);
-    setTplDow(1);
+    setTplDows([1]);
     setTplSubjectId(null);
     setTplDur(60);
+  };
+
+  const toggleTplDow = (dow: number) => {
+    setTplDows((prev) =>
+      prev.includes(dow)
+        ? prev.length > 1
+          ? prev.filter((d) => d !== dow)
+          : prev
+        : [...prev, dow].sort((a, b) => a - b)
+    );
   };
 
   const closeTemplateForm = () => {
@@ -123,11 +135,34 @@ export default function GoalDetailScreen() {
   };
 
   const submitTemplate = async () => {
-    if (tplSubjectId === null) return;
-    const input = { subjectId: tplSubjectId, dow: tplDow, dur: tplDur };
-    if (editingTemplate) await updateTemplate(editingTemplate.id, input);
-    else await createTemplate(input);
+    if (tplSubjectId === null || tplDows.length === 0) return;
+    if (editingTemplate) {
+      await updateTemplate(editingTemplate.id, {
+        subjectId: tplSubjectId,
+        dow: tplDows[0],
+        dur: tplDur,
+      });
+    } else {
+      for (const dow of tplDows) {
+        await createTemplate({ subjectId: tplSubjectId, dow, dur: tplDur });
+      }
+    }
     closeTemplateForm();
+  };
+
+  const clearDay = async (dow: number) => {
+    const dayTemplateIds = templateRows
+      .filter((r) => r.template.dow === dow)
+      .map((r) => r.template.id);
+    for (const id of dayTemplateIds) {
+      await deleteTemplate(id);
+    }
+  };
+
+  const clearAllDays = async () => {
+    for (const { template } of templateRows) {
+      await deleteTemplate(template.id);
+    }
   };
 
   if (!goal) return <View className="flex-1 bg-background" />;
@@ -244,15 +279,25 @@ export default function GoalDetailScreen() {
       </Text>
 
       {subjects.length > 0 ? (
-        <Button
-          className="mb-4 flex-row gap-1.5"
-          onPress={() => {
-            resetTemplateForm();
-            setTemplateFormOpen(true);
-          }}>
-          <Icon as={Plus} size={16} className="text-primary-foreground" />
-          <Text>Novo horário</Text>
-        </Button>
+        <View className="mb-4 flex-row gap-2.5">
+          <Button
+            className="flex-1 flex-row gap-1.5"
+            onPress={() => {
+              resetTemplateForm();
+              setTemplateFormOpen(true);
+            }}>
+            <Icon as={Plus} size={16} className="text-primary-foreground" />
+            <Text>Novo horário</Text>
+          </Button>
+          {templateRows.length > 0 ? (
+            <Pressable
+              onPress={() => setClearAllOpen(true)}
+              className="h-11 items-center justify-center rounded-lg border border-border px-4"
+              accessibilityLabel="Limpar todo o cronograma">
+              <Icon as={Trash2} size={16} className="text-muted-foreground" />
+            </Pressable>
+          ) : null}
+        </View>
       ) : null}
 
       {templateRows.length === 0 ? (
@@ -272,9 +317,16 @@ export default function GoalDetailScreen() {
             if (dayRows.length === 0) return null;
             return (
               <View key={dow} className="rounded-xl border border-border bg-card px-3.5 py-3">
-                <Text className="mb-2 font-mono text-[11px] tracking-[1.5px] text-muted-foreground">
-                  {weekdayLabelFromDow(dow)}
-                </Text>
+                <View className="mb-2 flex-row items-center justify-between">
+                  <Text className="font-mono text-[11px] tracking-[1.5px] text-muted-foreground">
+                    {weekdayLabelFromDow(dow)}
+                  </Text>
+                  <Pressable onPress={() => setDowToClear(dow)} accessibilityLabel={`Limpar ${weekdayLabelFromDow(dow)}`}>
+                    <Text className="text-[11px] font-sans-semibold text-muted-foreground">
+                      Limpar
+                    </Text>
+                  </Pressable>
+                </View>
                 <View className="gap-1.5">
                   {dayRows.map(({ template, subject }) => (
                     <View key={template.id} className="min-h-11 flex-row items-center gap-2.5">
@@ -291,7 +343,7 @@ export default function GoalDetailScreen() {
                       <Pressable
                         onPress={() => {
                           setEditingTemplate(template);
-                          setTplDow(template.dow);
+                          setTplDows([template.dow]);
                           setTplSubjectId(template.subjectId);
                           setTplDur(template.dur);
                           setTemplateFormOpen(true);
@@ -319,14 +371,18 @@ export default function GoalDetailScreen() {
         <DialogContent className="w-full max-w-96 rounded-2xl">
           <DialogTitle>{editingTemplate ? 'Editar horário' : 'Novo horário'}</DialogTitle>
           <View>
-            <FieldLabel>DIA DA SEMANA</FieldLabel>
+            <FieldLabel>
+              {editingTemplate ? 'DIA DA SEMANA' : 'DIA(S) DA SEMANA'}
+            </FieldLabel>
             <View className="mb-3 mt-2 flex-row flex-wrap gap-1.5">
               {[1, 2, 3, 4, 5, 6, 7].map((dow) => (
                 <Chip
                   key={dow}
                   label={weekdayLabelFromDow(dow)}
-                  selected={tplDow === dow}
-                  onPress={() => setTplDow(dow)}
+                  selected={tplDows.includes(dow)}
+                  onPress={() =>
+                    editingTemplate ? setTplDows([dow]) : toggleTplDow(dow)
+                  }
                 />
               ))}
             </View>
@@ -353,8 +409,14 @@ export default function GoalDetailScreen() {
                 />
               ))}
             </View>
-            <Button onPress={submitTemplate} disabled={tplSubjectId === null}>
-              <Text>{editingTemplate ? 'Salvar alterações' : 'Adicionar ao cronograma'}</Text>
+            <Button onPress={submitTemplate} disabled={tplSubjectId === null || tplDows.length === 0}>
+              <Text>
+                {editingTemplate
+                  ? 'Salvar alterações'
+                  : tplDows.length > 1
+                    ? `Adicionar a ${tplDows.length} dias`
+                    : 'Adicionar ao cronograma'}
+              </Text>
             </Button>
           </View>
         </DialogContent>
@@ -373,6 +435,20 @@ export default function GoalDetailScreen() {
         title="Excluir horário?"
         description="As sessões futuras ainda pendentes deste horário serão removidas. O histórico é mantido."
         onConfirm={() => templateToDelete && deleteTemplate(templateToDelete.id)}
+      />
+      <ConfirmDialog
+        open={dowToClear !== null}
+        onOpenChange={(open) => !open && setDowToClear(null)}
+        title={dowToClear !== null ? `Limpar ${weekdayLabelFromDow(dowToClear)}?` : ''}
+        description="Todas as matérias marcadas para esse dia serão removidas do cronograma. As sessões futuras ainda pendentes serão removidas; o histórico é mantido."
+        onConfirm={() => dowToClear !== null && clearDay(dowToClear)}
+      />
+      <ConfirmDialog
+        open={clearAllOpen}
+        onOpenChange={setClearAllOpen}
+        title="Limpar todo o cronograma?"
+        description="Todos os horários de todos os dias serão removidos. As sessões futuras ainda pendentes serão removidas; o histórico é mantido."
+        onConfirm={clearAllDays}
       />
     </ScrollView>
   );
